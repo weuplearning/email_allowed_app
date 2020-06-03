@@ -20,8 +20,7 @@ export default function FormDialog(props) {
   };
 
   const handleClose = () => {
-    console.log(textadd)
-    props.handletextchange(textadd,'add')
+    props.handletextchange(textadd, 'add')
     setOpen(false);
 
   };
@@ -29,9 +28,8 @@ export default function FormDialog(props) {
   const handleCloseCancel = () => {
     setOpen(false);
   }
-  ;
+    ;
   const _handleTextFieldChange = (e) => {
-    console.log(e.target.value)
     addingText(e.target.value);
   };
 
@@ -39,7 +37,7 @@ export default function FormDialog(props) {
     <div>
       <Button id="addbutton" color="primary" onClick={handleClickOpen}>
         <Fab color="primary" aria-label="add">
-                <AddIcon />
+          <AddIcon />
         </Fab>
       </Button>
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
@@ -49,7 +47,7 @@ export default function FormDialog(props) {
             Entrez le nom de l'organisation que vous souhaiter ajouter.
           </DialogContentText>
           <div id="add-org">
-          <TextField defaultValue={textadd}  className="standard-basic" onChange={(e)=>{_handleTextFieldChange(e)}} id="add-org-text" />
+            <TextField defaultValue={textadd} className="standard-basic" onChange={(e) => { _handleTextFieldChange(e) }} id="add-org-text" />
           </div>
         </DialogContent>
         <DialogActions>
