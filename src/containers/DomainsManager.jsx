@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import Panel from "../components/Panel";
 import CustomizedSnackBar from "../components/CustomizedSnackBar";
@@ -10,7 +9,7 @@ const devData = window.props;
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    fontFamily: "Roboto",
+    fontFamily: "Roboto !important",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -38,43 +37,46 @@ const DomainsManager = () => {
   const classes = useStyles();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = () => {
       if (process.env.NODE_ENV !== "development") {
-        await axios
-          .get("/tma_apps/tma_api/v0/email_allowed/")
-          .then((response) => setData(response.data))
-          .catch((error) => {
-            setLoading(true);
+        fetch('/tma_apps/tma_api/v0/email_allowed/',
+          {
+            credentials: "same-origin",
+            method: "GET",
+          }
+        )
+          .then(response => response.json())
+          .then((data) => {
+            setData(data)
+            setLoading(false)
+          }).catch((error) => {
+            setLoading(true)
             console.log(error.message);
-          });
+          })
       } else {
-        console.log(window.props);
         setData(devData);
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchData();
   }, []);
 
-  const saveData = useCallback(async (data) => {
-    await axios
-      .post("/tma_apps/tma_api/v0/email_allowed/", {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          'X-Requested-With': 'XMLHttpRequest',
-          "X-CSRFToken": window.csrf,
-        },
-        body: JSON.stringify(data),
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          setData(data);
-        }
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
+  const saveData = useCallback((data) => {
+    fetch('/tma_apps/tma_api/v0/email_allowed/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-CSRFToken': window.csrf
+      },
+      body: JSON.stringify(data)
+    }).then(function (response) {
+      if (response.status === 200) {
+        setData(data);
+      }
+    }).catch((error) => {
+      console.log(error.message);
+    });
   }, []);
 
   const removeExistingOrg = useCallback(
@@ -91,8 +93,8 @@ const DomainsManager = () => {
       const newData = { ...data };
       let allOrgs = []
 
-      for(let i = 0; i < Object.keys(newData).length; i++) {
-          allOrgs.push(Object.keys(newData)[i].toLowerCase());
+      for (let i = 0; i < Object.keys(newData).length; i++) {
+        allOrgs.push(Object.keys(newData)[i].toLowerCase());
       }
 
       if (
@@ -134,15 +136,15 @@ const DomainsManager = () => {
   const renderPanels = useCallback(() => {
     return Object.keys(data).map((org, index) => {
       return (
-          <header key={index}>
-            <Panel
-              org={org}
-              data={data}
-              removeExistingOrg={removeExistingOrg}
-              saveData={saveData}
-              handleChange={handleChange}
-            />
-          </header>
+        <header key={index}>
+          <Panel
+            org={org}
+            data={data}
+            removeExistingOrg={removeExistingOrg}
+            saveData={saveData}
+            handleChange={handleChange}
+          />
+        </header>
 
       );
     });
